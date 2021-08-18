@@ -1,43 +1,130 @@
-import sys, pygame, pygame.mixer
+import pygame
+from random import randint
+
 pygame.init()
 
-# SCREEN = pygame.display.set_mode((1280,720), pygame.RESIZABLE)
-SCREEN = pygame.display.set_mode((626,417), pygame.RESIZABLE)
+# draw screen, name, clock
+screen = pygame.display.set_mode((1280,720), pygame.RESIZABLE) #screen size
+screen_width = 1280
+screen_height = 720
+pygame.display.set_caption('Collect the Trash') #window title
+clock = pygame.time.Clock() 
+FPS = 120
 
-pygame.display.set_caption('Collect the Trash')
+#background
+court = pygame.image.load('images/bg_2.jpg').convert()
 
-bg_underwater = pygame.image.load('images/bg_1.jpg').convert()
-diver_up = pygame.image.load('images/diver-up.png').convert_alpha()
-# diver_down = pygame.image.load('images/diver-down.png').convert_alpha()
-# diver_frames = [diver_down, diver_up]
-# diver_index = 0
-# diver = diver_frames[diver_index]
-# diver_rect = diver_up.get_rect(center = (300,321))
+#text for score
+text_x = 15
+text_y = 15
+font = pygame.font.Font("freesansbold.ttf", 40)
 
-SCREEN.blit(bg_underwater,(0,0))
-# SCREEN.blit(diver_up,diver_rect)
-# SCREEN.blit(diver_up,[x,y])
-pygame.display.update()
-game_over = False
+#diver or player
+diver = pygame.image.load('images/diver-up.png').convert_alpha()
+diver_width = 300
+diver_pos_x = 640
+diver_pos_y = 600
+diver_rep_x = [diver_pos_x, diver_pos_x] 
+diver_rep_y = [diver_pos_y, diver_pos_y]
+diver_speed = 10  #driver speed movement
 
-clock = pygame.time.Clock()
-# FPS = 120
+#object plastic
+plastic = pygame.image.load('images/plastic.png').convert_alpha()
+x = randint(0, screen_width)
+y = 0
+radius = 100
+plastic_rep_x = x
+plastic_rep_y = y
+speed = 5 #speed of the plastic fall
 
+play = True
 
-while not game_over:
-    clock.tick(120)  
+#background music
+bg_music = pygame.mixer.Sound("sounds/theme-song.wav")
+bg_music.play(-1)
+
+#sound effect
+ting = pygame.mixer.Sound("sounds/ting.wav")
+
+#score
+score = 0
+
+def check_for_event():
+    global play, diver_pos_x, diver_pos_y
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            game_over = True
-    # SCREEN.blit(diver_up,diver_rect)
-    
-    diver_position = pygame.mouse.get_pos()
-    print(diver_position)
-    x = diver_position[0]
-    y = diver_position[1]
-    SCREEN.blit(diver_up,[x,y])
+            play = False
+    #cursor, diver movement
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        diver_pos_x -= diver_speed
+    if keys[pygame.K_RIGHT]:
+        diver_pos_x += diver_speed
 
+#show all image
+def show_images():
+    global diver_rep_x, diver_rep_y
+    screen.blit(plastic, (x,y))
+    screen.blit(diver, (diver_pos_x, diver_pos_y))
+    diver_rep_x = [diver_pos_x, diver_pos_x]
+    diver_rep_y = [diver_pos_y, diver_pos_y]
 
-    
+#plastic movement
+def update_plastic_pos():
+    global y, plastic_rep_x, plastic_rep_y
+    y += speed
+    plastic_rep_x = x + 50
+    plastic_rep_y = y + 50
+    initialise_plastic()
+
+def initialise_plastic():
+    global x, y
+    if y > screen_height - radius:
+        y = 0
+        x = randint(0, screen_width)
+
+#so the plastic stay on the display/window
+def enforce_border():
+    global x, y, diver_pos_x, diver_pos_y 
+    if x < 0:
+        x = 0
+    if x > screen_width - radius:
+        x = screen_width - radius
+    if y < 0:
+        y = 0
+    if y > screen_height - radius:
+        y = screen_height - radius
+#so the diver stay on the display/window    
+    if diver_pos_x < 0:
+        diver_pos_x = 0
+    if diver_pos_x > screen_width - diver_width:
+        diver_pos_x = screen_width - diver_width
+
+#the function still can't work
+def check_for_score():
+    global score
+    if plastic_rep_x in range(diver_rep_x[0], diver_rep_x[1]) and plastic_rep_y in range(diver_rep_y[0], diver_rep_y[1]): 
+        score += 1
+        tick.play() #sound effect
+    elif plastic_rep_y in range(diver_rep_y[0], diver_rep_y[1]) and plastic_rep_y not in range(diver_rep_x[0], diver_rep_x[1]): 
+        score = 0
+
+#display score
+def show_score():
+    score_disp = font.render("SCORE: " + str(score), True, (0,0,0))
+    screen.blit(score_disp, (text_x, text_y))
+    print(score)
+
+#main loop
+while play:
+    clock.tick(FPS)
+    screen.blit(court, (0,0))
+    check_for_event() 
+    update_plastic_pos() #plastic movement
+    enforce_border() 
+    show_images()
+    check_for_score()
+    show_score()
+    pygame.display.flip()
+
 pygame.quit()
-quit()
