@@ -22,8 +22,10 @@ x = randint(0, screen_width)
 y = 0
 radius = 100 # plastic width
 plastic_rep_x = x + 50 # keep the plastic in range x
+print("plastic in x: " + str(plastic_rep_x))
 plastic_rep_y = y + 50 # keep the plastic in range y
-speed = 10
+print("plastic in y: " + str(plastic_rep_y))
+speed = 3
 
 # import player and set initialization
 player = pygame.image.load("images/diver2.png").convert_alpha()
@@ -31,8 +33,10 @@ player_width = 125
 player_pos_x = 450
 player_pos_y = 500
 player_speed = 8
-player_rep_x = [player_pos_x + 31, player_pos_x + 94] # region to score
-player_rep_y = [player_pos_y + 14, player_pos_y + 20] #region to score
+player_rep_x = [player_pos_x + 31, player_pos_x + 94] # region to score 481,494
+print("player_rep_x: " + str(player_rep_x))
+player_rep_y = [player_pos_y + 14, player_pos_y + 20] #region to score 514,520
+print("player_rep_y: " + str(player_rep_y))
 
 # initialitation text score, size and font
 black = (0, 0, 0)
@@ -73,7 +77,9 @@ def update_pos_plastic():
     global y, plastic_rep_x, plastic_rep_y
     y += speed
     plastic_rep_x = x + 50
+    #print("update plastic x: " +str(plastic_rep_x))
     plastic_rep_y = y + 50
+    #print("update plastic y: " + str(plastic_rep_y))
     initialise_plastic()
 
 # 4 initialize plastic
@@ -101,10 +107,12 @@ def enforce_border():
 # count score or reset
 def check_for_score():
     global score
-    if plastic_rep_x in range(player_rep_x[0], player_rep_x[1]) and plastic_rep_y in range (player_rep_y[0], player_rep_y[1]):
+    if plastic_rep_x in range(player_rep_x[0], player_rep_x[1]) or plastic_rep_y in range (player_rep_y[0], player_rep_y[1]):
         score += 1
         ting.play()
-    elif plastic_rep_y in range(player_rep_y[0], player_rep_y[1]) and plastic_rep_x in range (player_rep_x[0], player_rep_x[1]):
+        print("plastic_rep_x: " + str(plastic_rep_x))
+        print("plastic_rep_y: " + str(plastic_rep_y))
+    elif plastic_rep_y in range(player_rep_y[0], player_rep_y[1]) and plastic_rep_x not in range (player_rep_x[0], player_rep_x[1]):
         score = 0
 
 
