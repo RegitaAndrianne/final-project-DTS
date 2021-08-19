@@ -1,18 +1,18 @@
-import pygame, sys
+import pygame
 from random import randint
 
 pygame.init()
 
 # draw screen, name, clock
-screen = pygame.display.set_mode((1280,720), pygame.RESIZABLE) #screen size
-screen_width = 1280
+screen = pygame.display.set_mode((1080,720), pygame.RESIZABLE) #screen size
+screen_width = 1080
 screen_height = 720
 pygame.display.set_caption('Collect the Trash') #window title
 clock = pygame.time.Clock() 
 # FPS = 120
 
 #background
-court = pygame.image.load('images/bg_2.jpg').convert()
+court = pygame.image.load('images/ocean.jpg').convert()
 
 #text for score
 text_x = 15
@@ -26,7 +26,8 @@ diver_pos_x = 500
 diver_pos_y = 550
 diver_rep_x = [diver_pos_x +31, diver_pos_x+94] 
 diver_rep_y = [diver_pos_y+14, diver_pos_y+20]
-diver_speed = 10  #driver speed movement
+
+diver_speed = 2  #driver speed movement
 
 #object plastic
 plastic = pygame.image.load('images/plastic.png').convert_alpha()
@@ -35,7 +36,7 @@ y = 0
 radius = 189
 plastic_rep_x = x
 plastic_rep_y = y
-speed = 2 #speed of the plastic fall
+speed = 1 #speed of the plastic fall
 
 play = True
 
@@ -54,6 +55,7 @@ def check_for_event():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             play = False
+            
     #cursor, diver movement
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
@@ -66,7 +68,7 @@ def show_images():
     global diver_rep_x, diver_rep_y
     screen.blit(plastic, (x,y))
     screen.blit(diver, (diver_pos_x, diver_pos_y))
-    diver_rep_x = [diver_pos_x+31, diver_pos_x+94]
+    diver_rep_x = [diver_pos_x +31, diver_pos_x+94] 
     diver_rep_y = [diver_pos_y+14, diver_pos_y+20]
 
 #plastic movement
@@ -101,11 +103,10 @@ def enforce_border():
         diver_pos_x = screen_width - diver_width
 
 
-#the function still can't work
 def check_for_score():
     global score
     if plastic_rep_x in range(diver_rep_x[0], diver_rep_x[1]) and plastic_rep_y in range(diver_rep_y[0], diver_rep_y[1]): 
-        score = score + 1
+        score += 1
         ting.play() #sound effect
     elif plastic_rep_y in range(diver_rep_y[0], diver_rep_y[1]) and plastic_rep_y not in range(diver_rep_x[0], diver_rep_x[1]): 
         score = 0
@@ -121,7 +122,7 @@ def show_score():
 #main loop
 while play:
     clock.tick()
-    screen.blit(court, (0,0))
+    screen.blit(court,(0,0))
     check_for_event() 
     update_plastic_pos() #plastic movement
     enforce_border() 
